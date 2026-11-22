@@ -8,6 +8,7 @@
   const adminView = document.querySelector("#admin-view");
   const authForm = document.querySelector("#auth-form");
   let studio = null;
+  let isSuperadmin = false;
 
   function showToast(message, type = "info") {
     const toast = document.createElement("div");
@@ -76,16 +77,8 @@
       return;
     }
     if (profile.role === "superadmin") {
-      const adminBrand = document.querySelector("#admin-brand");
-      adminBrand.textContent = "Панель проектов";
-      document.title = "Панель проектов";
-      document.querySelectorAll(".admin-tabs [data-tab]").forEach((tab) => {
-        tab.hidden = tab.dataset.tab !== "superadmin-admin";
-      });
-      document.querySelectorAll(".admin-panel").forEach((panel) => {
-        panel.hidden = panel.id !== "superadmin-admin";
-      });
-      await renderSuperadmin();
+      isSuperadmin = true;
+      await showProjectList();
       return;
     }
     const { data: assignment } = await supabase
@@ -124,14 +117,60 @@
   document.querySelector(".admin-tabs").addEventListener("click", async (event) => {
     const tab = event.target.closest("[data-tab]");
     if (!tab) return;
+    if (tab.dataset.tab === "superadmin-admin" && isSuperadmin) {
+      await showProjectList();
+      return;
+    }
     document.querySelectorAll("[data-tab]").forEach((item) => item.classList.toggle("active", item === tab));
     document.querySelectorAll(".admin-panel").forEach((panel) => panel.hidden = panel.id !== tab.dataset.tab);
     if (tab.dataset.tab === "schedule-admin") await renderSchedule();
     if (tab.dataset.tab === "trainers-admin") await renderTrainers();
     if (tab.dataset.tab === "settings-admin") await renderSettings();
     if (tab.dataset.tab === "bookings-admin") await renderBookings();
-    if (tab.dataset.tab === "superadmin-admin") await renderSuperadmin();
   });
+
+  async function showProjectList() {
+    studio = null;
+    document.querySelector("#admin-brand").textContent = "Панель проектов";
+    document.title = "Панель проектов";
+    const projectTab = document.querySelector("#superadmin-tab");
+    projectTab.textContent = "Проекты";
+    document.querySelectorAll(".admin-tabs [data-tab]").forEach((tab) => {
+      tab.hidden = tab !== projectTab;
+      tab.classList.toggle("active", tab === projectTab);
+    });
+    document.querySelectorAll(".admin-panel").forEach((panel) => {
+      panel.hidden = panel.id !== "superadmin-admin";
+    });
+    await renderSuperadmin();
+  }
+
+  async function enterProjectAdmin(studioId) {
+    const { data, error } = await supabase
+      .from("studios")
+      .select("*")
+      .eq("id", studioId)
+      .single();
+    if (error) {
+      console.error(error);
+      showToast("Не удалось открыть проект", "error");
+      return;
+    }
+
+    studio = data;
+    document.querySelector("#admin-brand").textContent = `${studio.name} — администрирование`;
+    document.title = `${studio.name} — Панель`;
+    const projectTab = document.querySelector("#superadmin-tab");
+    projectTab.textContent = "← Проекты";
+    document.querySelectorAll(".admin-tabs [data-tab]").forEach((tab) => {
+      tab.hidden = false;
+      tab.classList.toggle("active", tab.dataset.tab === "schedule-admin");
+    });
+    document.querySelectorAll(".admin-panel").forEach((panel) => {
+      panel.hidden = panel.id !== "schedule-admin";
+    });
+    await renderSchedule();
+  }
 
   async function renderSuperadmin() {
     const panel = document.querySelector("#superadmin-admin");
@@ -200,6 +239,7 @@
             <p>Логин: ${escapeHtml(project.admin_login || project.admin_email || "")}</p>
           </div>
           <div>
+            <button class="glass-button open-project-admin" data-id="${escapeHtml(project.id)}">Открыть админку</button>
             <button class="glass-button edit-project" data-id="${project.id}" data-name="${escapeHtml(project.name)}" data-slug="${escapeHtml(project.slug)}">Изменить</button>
             <button class="glass-button reset-project-password" data-id="${project.id}">Пароль</button>
             <div><strong>${escapeHtml(project.admin_initial_password || "Пароль изменён")}</strong></div>
@@ -208,6 +248,11 @@
       : "<p>Проектов пока нет</p>";
 
     document.querySelector("#projects-list").addEventListener("click", async (event) => {
+      const openButton = event.target.closest(".open-project-admin");
+      if (openButton) {
+        await enterProjectAdmin(openButton.dataset.id);
+        return;
+      }
       const editButton = event.target.closest(".edit-project");
       if (editButton) {
         const name = prompt("Название проекта", editButton.dataset.name);
@@ -369,7 +414,7 @@
         <label>Telegram Chat ID<input name="tg_chat_id" value="${escapeHtml(studio.tg_chat_id || "")}"></label>
         <p>${studio.tg_started_at ? "Telegram подключён" : "Telegram не подтверждён"}</p>
         <button id="check-tg-start" type="button" class="glass-button">Я нажал /start в боте</button>
-        <label>Новый пароль администратора<input name="new_password" type="password" minlength="8" autocomplete="new-password"></label>
+        <label>${isSuperadmin ? "Новый пароль администратора проекта" : "Новый пароль администратора"}<input name="new_password" type="password" minlength="8" maxlength="128" autocomplete="new-password"></label>
         <button class="primary-button" type="submit">Сохранить</button>
       </form>`;
 
@@ -405,16 +450,28 @@
       };
       const newPassword = form.get("new_password");
       if (newPassword) {
-        const { error: passwordError } = await supabase.auth.updateUser({ password: newPassword });
+        const passwordResult = isSuperadmin
+          ? await supabase.functions.invoke("manage-project", {
+            body: { action: "change_password", studio_id: studio.id, password: newPassword },
+          })
+          : await supabase.auth.updateUser({ password: newPassword });
+        const passwordError = passwordResult.error;
         if (passwordError) {
           console.error(passwordError);
           showToast("Не удалось изменить пароль", "error");
           return;
         }
-        await supabase
-          .from("studios")
-          .update({ admin_initial_password: newPassword })
-          .eq("id", studio.id);
+        if (!isSuperadmin) {
+          const { error: credentialError } = await supabase
+            .from("studios")
+            .update({ admin_initial_password: newPassword })
+            .eq("id", studio.id);
+          if (credentialError) {
+            console.error(credentialError);
+            showToast("Пароль изменён, но не удалось обновить запись в проекте", "error");
+            return;
+          }
+        }
       }
       const { error } = await supabase.from("studios").update(updates).eq("id", studio.id);
       if (error) {

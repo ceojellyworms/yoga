@@ -85,6 +85,39 @@ Deno.serve(async (request) => {
       });
     }
 
+    if (body.action === "change_password") {
+      const password = String(body.password || "");
+      if (password.length < 8 || password.length > 128) {
+        return new Response(JSON.stringify({ error: "Password must be between 8 and 128 characters" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: studio, error: studioError } = await supabase
+        .from("studios")
+        .select("user_id")
+        .eq("id", studioId)
+        .single();
+      if (studioError) throw studioError;
+
+      const { error: authError } = await supabase.auth.admin.updateUserById(studio.user_id, {
+        password,
+      });
+      if (authError) throw authError;
+
+      const { error: dbError } = await supabase
+        .from("studios")
+        .update({ admin_initial_password: password })
+        .eq("id", studioId);
+      if (dbError) throw dbError;
+
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     throw new Error("Unknown action");
   } catch (error) {
     console.error(error);
