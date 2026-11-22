@@ -146,9 +146,17 @@
         showToast("Не удалось создать проект", "error");
         return;
       }
+      const resultPanel = document.querySelector("#projects-list");
+      const credentialsPanel = document.createElement("div");
+      credentialsPanel.className = "admin-form";
+      credentialsPanel.innerHTML = `
+        <h3>Проект создан</h3>
+        <p>Адрес: <strong>${escapeHtml(data.url)}</strong></p>
+        <p>Email: <strong>${escapeHtml(data.credentials.email)}</strong></p>
+        <p>Пароль: <strong>${escapeHtml(data.credentials.password)}</strong></p>`;
+      resultPanel.before(credentialsPanel);
       showToast("Проект создан");
-      alert(`Адрес: ${data.url}\nEmail: ${data.credentials.email}\nПароль: ${data.credentials.password}`);
-      await renderSuperadmin();
+      event.currentTarget.reset();
     });
 
     const { data, error } = await supabase
