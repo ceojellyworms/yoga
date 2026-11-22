@@ -56,8 +56,8 @@ Deno.serve(async (request) => {
     }
 
     if (body.action === "reset_password") {
-      const password = String(body.password || "");
-      if (password.length < 8) throw new Error("Password must contain at least 8 characters");
+      const bytes = crypto.getRandomValues(new Uint8Array(12));
+      const password = `Ps-${Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
       const { data: studio, error: studioError } = await supabase
         .from("studios")
         .select("user_id")
@@ -73,7 +73,7 @@ Deno.serve(async (request) => {
         .update({ admin_initial_password: password })
         .eq("id", studioId);
       if (dbError) throw dbError;
-      return new Response(JSON.stringify({ ok: true }), {
+      return new Response(JSON.stringify({ ok: true, password }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

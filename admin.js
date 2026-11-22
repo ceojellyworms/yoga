@@ -30,11 +30,29 @@
     event.preventDefault();
     if (!supabase) return;
     const form = new FormData(authForm);
-    const credentials = {
-      email: form.get("email"),
-      password: form.get("password"),
-    };
-    const { error } = await supabase.auth.signInWithPassword(credentials);
+    const login = String(form.get("login") || "").trim();
+    const password = form.get("password");
+    let error = null;
+    if (login.includes("@")) {
+      const result = await supabase.auth.signInWithPassword({ email: login, password });
+      error = result.error;
+    } else {
+      const { data, error: functionError } = await supabase.functions.invoke("login-project-admin", {
+        body: { login, password },
+      });
+      if (functionError) {
+        console.error(functionError);
+        error = functionError;
+      } else if (data?.access_token && data?.refresh_token) {
+        const result = await supabase.auth.setSession({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        });
+        error = result.error;
+      } else {
+        error = new Error(data?.error || "Неверный логин или пароль");
+      }
+    }
     if (error) {
       console.error(error);
       showToast("Не удалось войти", "error");
@@ -123,8 +141,6 @@
       <form id="project-form" class="admin-form">
         <label>Название проекта<input name="name" required placeholder="Название студии" /></label>
         <label>Адрес проекта<input name="slug" required placeholder="например: moon-yoga" /></label>
-        <label>Email администратора клуба<input name="admin_email" type="email" required /></label>
-        <label>Пароль администратора клуба<input name="admin_password" type="password" minlength="8" required /></label>
         <button class="primary-button" type="submit">Создать проект</button>
       </form>
       <div id="projects-list">Загрузка...</div>`;
@@ -136,14 +152,12 @@
         body: {
           name: form.get("name"),
           slug: form.get("slug"),
-          admin_email: form.get("admin_email"),
-          admin_password: form.get("admin_password"),
           site_url: `${location.origin}/`,
         },
       });
       if (error) {
         console.error(error);
-        showToast("Не удалось создать проект", "error");
+        showToast(data?.error || "Не удалось создать проект", "error");
         return;
       }
       const resultPanel = document.querySelector("#projects-list");
@@ -152,7 +166,7 @@
       credentialsPanel.innerHTML = `
         <h3>Проект создан</h3>
         <p>Адрес: <strong>${escapeHtml(data.url)}</strong></p>
-        <p>Email: <strong>${escapeHtml(data.credentials.email)}</strong></p>
+        <p>Логин: <strong>${escapeHtml(data.credentials.login)}</strong></p>
         <p>Пароль: <strong>${escapeHtml(data.credentials.password)}</strong></p>`;
       resultPanel.before(credentialsPanel);
       showToast("Проект создан");
@@ -161,7 +175,7 @@
 
     const { data, error } = await supabase
       .from("studios")
-      .select("id,name,slug,admin_email,admin_initial_password,created_at")
+      .select("id,name,slug,admin_login,admin_email,admin_initial_password,created_at")
       .order("created_at", { ascending: false });
     if (error) {
       console.error(error);
@@ -174,7 +188,7 @@
           <div>
             <h3>${escapeHtml(project.name)}</h3>
             <p><a href="/${escapeHtml(project.slug)}" target="_blank">/${escapeHtml(project.slug)}</a></p>
-            <p>${escapeHtml(project.admin_email || "")}</p>
+            <p>Логин: ${escapeHtml(project.admin_login || project.admin_email || "")}</p>
           </div>
           <div>
             <button class="glass-button edit-project" data-id="${project.id}" data-name="${escapeHtml(project.name)}" data-slug="${escapeHtml(project.slug)}">Изменить</button>
@@ -204,17 +218,16 @@
       }
       const resetButton = event.target.closest(".reset-project-password");
       if (resetButton) {
-        const password = prompt("Новый пароль администратора проекта (минимум 8 символов)");
-        if (!password) return;
+        if (!confirm("Сгенерировать новый пароль для администратора проекта?")) return;
         const { error } = await supabase.functions.invoke("manage-project", {
-          body: { action: "reset_password", studio_id: resetButton.dataset.id, password },
+          body: { action: "reset_password", studio_id: resetButton.dataset.id },
         });
         if (error) {
           console.error(error);
           showToast("Не удалось сменить пароль", "error");
         } else {
           await renderSuperadmin();
-          showToast("Пароль проекта изменён");
+          showToast(`Новый пароль: ${data.password}`);
         }
       }
     });
