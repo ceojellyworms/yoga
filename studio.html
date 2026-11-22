@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#e0f7fa" />
+    <title>Flow Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="public-page">
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+    <header class="site-header">
+      <a class="brand" href="/flow-studio" aria-label="Flow Studio">FLOW <span>STUDIO</span></a>
+      <nav class="main-nav" aria-label="Главная навигация">
+        <a href="#directions">Направления</a>
+        <a href="#schedule">Расписание</a>
+        <a href="#about">Атмосфера</a>
+      </nav>
+      <a class="account-link" href="/admin">Личный кабинет</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Йога и танцы</p>
+          <h1>Найди гармонию в движении</h1>
+          <p>Тёплое пространство для тела и ума. Начни с занятия, которое чувствуешь своим.</p>
+          <button id="trial-button" class="primary-button">Записаться на пробное</button>
+        </div>
+        <model-viewer
+          class="hero-model"
+          src="/assets/yoga_-_buddha.glb"
+          alt="Статуя Будды в позе лотоса"
+          auto-rotate
+          rotation-per-second="30deg"
+          camera-controls
+          disable-zoom
+          shadow-intensity="1"
+          shadow-softness="0.8"
+          exposure="1.2"
+          camera-orbit="0deg 68deg 105%"
+        ></model-viewer>
+      </section>
+
+      <section id="directions" class="section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Направления</p>
+          <h2>Выбери своё</h2>
+        </div>
+        <div class="direction-grid">
+          <article class="direction-card reveal">
+            <model-viewer src="/assets/girl_yoga.glb" alt="Йога" auto-rotate rotation-per-second="24deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
+            <div class="card-copy">
+              <h3>Йога</h3>
+              <p>Мягкая практика для силы, гибкости и внутреннего баланса.</p>
+              <button class="glass-button scroll-schedule">Узнать расписание</button>
+            </div>
+          </article>
+          <article class="direction-card reveal">
+            <model-viewer src="/assets/blue_dress_modern_dancer.glb" alt="Танцы" auto-rotate rotation-per-second="24deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
+            <div class="card-copy">
+              <h3>Танцы</h3>
+              <p>Движение с музыкой, элегантностью и чувством свободы.</p>
+              <button class="glass-button scroll-schedule">Узнать расписание</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="schedule" class="section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Расписание</p>
+          <h2>Ваше время</h2>
+        </div>
+        <div id="day-tabs" class="day-tabs" aria-label="Дни недели"></div>
+        <div id="schedule-list" class="schedule-list" aria-live="polite">
+          <div class="schedule-skeleton"></div>
+          <div class="schedule-skeleton"></div>
+          <div class="schedule-skeleton"></div>
+        </div>
+      </section>
+
+      <section id="about" class="section atmosphere">
+        <div class="section-heading reveal">
+          <p class="eyebrow">О студии</p>
+          <h2>Пространство для вдохновения</h2>
+        </div>
+        <model-viewer
+          class="barn-model reveal"
+          src="/assets/virtual_fantasy_yoga_barn.glb"
+          alt="Йога-бarn в 3D"
+          auto-rotate
+          rotation-per-second="6deg"
+          disable-zoom
+          interaction-prompt="none"
+          camera-orbit="-25deg 58deg 155%"
+          field-of-view="28deg"
+          shadow-intensity="1"
+          shadow-softness="1"
+          exposure="1.5"
+          tone-mapping="neutral"
+        ></model-viewer>
+      </section>
+    </main>
+
+    <dialog id="booking-dialog" class="booking-dialog">
+      <form id="booking-form" method="dialog">
+        <button type="button" id="close-dialog" class="dialog-close" aria-label="Закрыть">×</button>
+        <div id="booking-fields">
+          <p class="eyebrow">Бронирование</p>
+          <h2 id="booking-title">Выберите занятие</h2>
+          <label>Имя
+            <input name="client_name" required minlength="2" autocomplete="name" placeholder="Ваше имя" />
+          </label>
+          <label>Телефон
+            <input id="phone-input" name="client_phone" required autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" />
+          </label>
+          <button class="primary-button" type="submit">Отправить</button>
+        </div>
+        <div id="booking-success" class="booking-success" hidden>
+          <div class="success-mark">✓</div>
+          <h2>Заявка отправлена</h2>
+          <p>Мы свяжемся с вами в ближайшее время.</p>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/config.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

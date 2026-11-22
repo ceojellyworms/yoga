@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/flow-studio", "destination": "/studio.html" },
+    { "source": "/flow-studio/", "destination": "/studio.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/admin/", "destination": "/admin.html" },
+    { "source": "/:slug", "destination": "/studio.html" }
+  ]
+}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flow Studio — Личный кабинет</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="toast-region" class="toast-region"></div>
+    <main class="admin-shell">
+      <section id="auth-view" class="auth-card">
+        <a class="brand" href="./index.html">FLOW <span>STUDIO</span></a>
+        <h1>Личный кабинет</h1>
+        <form id="auth-form">
+          <label>Email<input name="email" type="email" required autocomplete="email" /></label>
+          <label>Пароль<input name="password" type="password" required autocomplete="current-password" /></label>
+          <button id="auth-submit" class="primary-button" type="submit">Войти</button>
+        </form>
+      </section>
+
+      <section id="admin-view" hidden>
+        <header class="admin-header">
+          <a class="brand" href="./index.html">FLOW <span>STUDIO</span></a>
+          <button id="logout-button" class="glass-button">Выйти</button>
+        </header>
+        <nav class="admin-tabs">
+          <button class="day-tab active" data-tab="schedule-admin">Расписание</button>
+          <button class="day-tab" data-tab="trainers-admin">Тренеры</button>
+          <button class="day-tab" data-tab="settings-admin">Настройки</button>
+          <button class="day-tab" data-tab="bookings-admin">Заявки</button>
+          <button class="day-tab" data-tab="superadmin-admin" id="superadmin-tab" hidden>Проекты</button>
+        </nav>
+        <div id="schedule-admin" class="admin-panel"></div>
+        <div id="trainers-admin" class="admin-panel" hidden></div>
+        <div id="settings-admin" class="admin-panel" hidden></div>
+        <div id="bookings-admin" class="admin-panel" hidden></div>
+        <div id="superadmin-admin" class="admin-panel" hidden></div>
+      </section>
+    </main>
+    <script src="./config.js"></script>
+    <script src="./admin.js"></script>
+  </body>
+</html>
