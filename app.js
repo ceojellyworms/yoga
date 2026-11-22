@@ -8,6 +8,8 @@
   const scheduleList = document.querySelector("#schedule-list");
   const dialog = document.querySelector("#booking-dialog");
   const form = document.querySelector("#booking-form");
+  const menuToggle = document.querySelector(".menu-toggle");
+  const mainNav = document.querySelector("#main-nav");
   const bookingFields = document.querySelector("#booking-fields");
   const bookingSuccess = document.querySelector("#booking-success");
   const bookingTitle = document.querySelector("#booking-title");
@@ -149,6 +151,18 @@
   trialButton?.addEventListener("click", () => {
     document.querySelector("#schedule").scrollIntoView({ behavior: "smooth" });
   });
+  menuToggle?.addEventListener("click", () => {
+    const expanded = menuToggle.getAttribute("aria-expanded") === "true";
+    menuToggle.setAttribute("aria-expanded", String(!expanded));
+    menuToggle.setAttribute("aria-label", expanded ? "Открыть меню" : "Закрыть меню");
+    mainNav.dataset.open = String(!expanded);
+  });
+  mainNav?.addEventListener("click", (event) => {
+    if (!event.target.closest("a")) return;
+    menuToggle?.setAttribute("aria-expanded", "false");
+    menuToggle?.setAttribute("aria-label", "Открыть меню");
+    delete mainNav.dataset.open;
+  });
   document.querySelectorAll(".scroll-schedule").forEach((button) => {
     button.addEventListener("click", () => document.querySelector("#schedule").scrollIntoView({ behavior: "smooth" }));
   });
@@ -205,6 +219,9 @@
     });
   }, { threshold: 0.12 });
   document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll("model-viewer[auto-rotate]").forEach((viewer) => viewer.removeAttribute("auto-rotate"));
+  }
 
   renderTabs();
   loadStudioSettings();

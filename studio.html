@@ -3,57 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#e0f7fa" />
+    <meta name="theme-color" content="#f4f1ea" />
+    <meta name="description" content="Йога и танцы в Flow Studio. Выберите занятие и запишитесь онлайн." />
     <title>Flow Studio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="preload" as="image" href="/assets/buddha-poster.webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/barn-poster.webp" fetchpriority="high" />
+    <link rel="preconnect" href="https://ajax.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://llatgmpjzcotecfsgodm.supabase.co" crossorigin />
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="/styles.css" />
-    <link rel="stylesheet" href="/vendor/liquid-glass/glass.css" />
   </head>
   <body class="public-page">
     <div id="toast-region" class="toast-region" aria-live="polite"></div>
     <header class="site-header">
       <a class="brand" href="/flow-studio" aria-label="Flow Studio">FLOW <span>STUDIO</span></a>
-      <nav class="main-nav" aria-label="Главная навигация">
+      <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="main-nav">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
+      <nav id="main-nav" class="main-nav" aria-label="Главная навигация">
         <a href="#directions">Направления</a>
         <a href="#schedule">Расписание</a>
         <a href="#about">Атмосфера</a>
       </nav>
-      <a class="account-link" href="/admin">Личный кабинет</a>
+      <a class="account-link liquid-control" href="/admin">Личный кабинет</a>
     </header>
 
     <main>
       <section class="hero">
-        <div class="hero-copy reveal">
+        <div class="hero-copy">
           <p class="eyebrow">Йога и танцы</p>
           <h1>Найди гармонию в движении</h1>
           <p>Тёплое пространство для тела и ума. Начни с занятия, которое чувствуешь своим.</p>
-          <button id="trial-button" class="primary-button">Записаться на пробное</button>
+          <button id="trial-button" class="primary-button liquid-control">Записаться на пробное</button>
         </div>
         <model-viewer
           class="hero-barn"
           src="/assets/virtual_fantasy_yoga_barn.glb"
-          alt="Йога-студия в 3D"
+          poster="/assets/barn-poster.webp"
+          alt=""
+          aria-hidden="true"
+          loading="eager"
           disable-zoom
           interaction-prompt="none"
           camera-orbit="-25deg 58deg 105%"
           field-of-view="28deg"
           shadow-intensity="1"
           shadow-softness="1"
-          exposure="1.35"
+          exposure="1.2"
           tone-mapping="neutral"
         ></model-viewer>
         <model-viewer
           class="hero-model"
           src="/assets/yoga_-_buddha.glb"
+          poster="/assets/buddha-poster.webp"
           alt="Статуя Будды в позе лотоса"
+          loading="eager"
           auto-rotate
-          rotation-per-second="12deg"
+          rotation-per-second="1.5deg"
           camera-controls
           disable-zoom
+          interaction-prompt="none"
           shadow-intensity="1"
           shadow-softness="0.8"
           exposure="1.2"
@@ -68,7 +81,7 @@
         </div>
         <div class="direction-grid">
           <article class="direction-card reveal">
-            <model-viewer src="https://llatgmpjzcotecfsgodm.supabase.co/storage/v1/object/public/model-assets/girl_yoga.glb" alt="Йога" loading="lazy" auto-rotate rotation-per-second="24deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
+            <model-viewer src="/assets/girl_yoga.glb" alt="Йога" loading="lazy" decoding="async" auto-rotate rotation-per-second="2deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
             <div class="card-copy">
               <h3>Йога</h3>
               <p>Мягкая практика для силы, гибкости и внутреннего баланса.</p>
@@ -76,7 +89,7 @@
             </div>
           </article>
           <article class="direction-card reveal">
-            <model-viewer src="https://llatgmpjzcotecfsgodm.supabase.co/storage/v1/object/public/model-assets/blue_dress_modern_dancer.glb" alt="Танцы" loading="lazy" auto-rotate rotation-per-second="24deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
+            <model-viewer src="/assets/blue_dress_modern_dancer.glb" alt="Танцы" loading="lazy" decoding="async" auto-rotate rotation-per-second="2deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
             <div class="card-copy">
               <h3>Танцы</h3>
               <p>Движение с музыкой, элегантностью и чувством свободы.</p>
@@ -129,11 +142,7 @@
       </form>
     </dialog>
 
-    <script src="/config.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="/vendor/liquid-glass/container.js"></script>
-    <script src="/vendor/liquid-glass/button.js"></script>
-    <script src="/liquid-glass.js"></script>
-    <script src="/app.js"></script>
+    <script defer src="/config.js"></script>
+    <script defer src="/app.js"></script>
   </body>
 </html>
