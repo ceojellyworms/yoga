@@ -34,6 +34,7 @@ body {
 .account-link { padding: 10px 16px; border: 1px solid rgba(77,208,225,.38); border-radius: 999px; background: rgba(255,255,255,.7); }
 
 .hero {
+  position: relative;
   min-height: calc(100vh - 76px);
   display: grid;
   grid-template-columns: minmax(280px, .85fr) 1.15fr;
@@ -41,13 +42,33 @@ body {
   gap: 20px;
   padding: 40px clamp(20px, 7vw, 100px);
   overflow: hidden;
-  background: radial-gradient(circle at 75% 45%, rgba(255,255,255,.95), transparent 30%), linear-gradient(135deg, var(--mint), #fff 76%);
+  background: linear-gradient(135deg, #e6fafa 0%, #f9ffff 55%, #edfafa 100%);
 }
-.hero-copy { position: relative; z-index: 2; max-width: 560px; }
+.hero-copy { position: relative; z-index: 3; max-width: 560px; }
 .eyebrow { margin: 0 0 12px; color: #3aaebe; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-.hero h1 { max-width: 600px; margin: 0 0 20px; font-size: clamp(44px, 7vw, 82px); line-height: .99; letter-spacing: -.055em; }
+.hero h1 { max-width: 600px; margin: 0 0 20px; font-size: clamp(44px, 5vw, 72px); line-height: .99; letter-spacing: -.055em; }
 .hero-copy > p:not(.eyebrow) { max-width: 500px; font-size: 18px; line-height: 1.7; }
-.hero-model { width: 100%; height: min(68vh, 680px); background: transparent; }
+.hero-barn {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  opacity: .88;
+  filter: saturate(.72) brightness(1.08);
+  --poster-color: transparent;
+}
+.hero-model {
+  position: absolute;
+  z-index: 2;
+  right: 4%;
+  bottom: -6%;
+  width: 40%;
+  height: 88%;
+  background: transparent;
+  --poster-color: transparent;
+}
 
 .primary-button, .glass-button {
   border: 0;
@@ -56,6 +77,24 @@ body {
   font-family: inherit;
   font-weight: 700;
   transition: transform .2s, box-shadow .2s, background .2s;
+}
+
+.liquid-glass-native {
+  display: none;
+}
+
+.liquid-glass-button {
+  margin: 8px 0 0;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, .82),
+    inset 0 -1px rgba(24, 52, 58, .08),
+    0 12px 28px rgba(53, 184, 200, .18);
+}
+
+.liquid-glass-button .glass-button-text {
+  color: #18343a;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
 }
 .primary-button { margin-top: 12px; padding: 16px 24px; color: white; background: #35b8c8; box-shadow: 0 14px 30px rgba(53,184,200,.24); }
 .glass-button { padding: 12px 18px; color: var(--ink); background: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.8); backdrop-filter: blur(12px); }
@@ -99,33 +138,22 @@ body {
 
 .atmosphere {
   position: relative;
-  min-height: 820px;
+  min-height: 420px;
   display: flex;
   align-items: flex-end;
-  padding: 0;
+  padding: 100px clamp(20px, 7vw, 100px);
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(228,249,247,.98) 0%, rgba(194,238,235,.96) 52%, rgba(87,192,194,.72) 100%);
+  background: linear-gradient(180deg, #eefafa 0%, #faffff 100%);
 }
 .atmosphere .section-heading {
-  position: absolute;
+  position: relative;
   z-index: 2;
-  top: 64px;
-  left: clamp(24px, 7vw, 100px);
+  top: auto;
+  left: auto;
   max-width: 700px;
   margin: 0;
   color: #18343a;
-  text-shadow: 0 2px 24px rgba(255,255,255,.72);
   pointer-events: none;
-}
-.barn-model {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 820px;
-  min-height: 820px;
-  border-radius: 0;
-  background: linear-gradient(180deg, rgba(240,253,252,.98) 0%, rgba(207,242,239,.86) 56%, rgba(83,185,188,.88) 100%);
-  box-shadow: inset 0 -140px 180px rgba(30,126,132,.24);
 }
 
 .booking-dialog { width: min(520px, calc(100% - 32px)); border: 0; border-radius: 24px; padding: 0; color: var(--ink); box-shadow: 0 30px 100px rgba(31,84,91,.28); }
@@ -228,8 +256,14 @@ body {
 
 @media (max-width: 900px) {
   .main-nav { display: none; }
-  .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 70px; }
-  .hero-model { height: 440px; }
+  .hero { grid-template-columns: 1fr; min-height: calc(100svh - 66px); padding: 44px 28px; }
+  .hero-barn { opacity: .58; }
+  .hero-model {
+    right: -8%;
+    bottom: -4%;
+    width: 72%;
+    height: 72%;
+  }
   .direction-grid, .schedule-list { grid-template-columns: 1fr; }
   .schedule-card { grid-template-columns: 74px 1fr; }
   .schedule-card .primary-button { grid-column: 1 / -1; }
@@ -238,17 +272,20 @@ body {
   .site-header { height: 66px; }
   .account-link { font-size: 12px; }
   .section { padding-block: 72px; }
-  .hero h1 { font-size: 48px; }
-  .hero-model { height: 360px; }
+  .hero { padding: 36px 20px; }
+  .eyebrow { margin-bottom: 16px; }
+  .hero h1 { font-size: 40px; }
+  .hero-model {
+    right: -18%;
+    bottom: -2%;
+    width: 86%;
+    height: 58%;
+  }
   .direction-card model-viewer { height: 300px; }
   .atmosphere {
-    min-height: 620px;
+    min-height: 320px;
   }
   .atmosphere .section-heading {
-    top: 36px;
-  }
-  .barn-model {
-    height: 620px;
-    min-height: 620px;
+    top: auto;
   }
 }

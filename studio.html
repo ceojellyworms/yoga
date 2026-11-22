@@ -11,6 +11,7 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/vendor/liquid-glass/glass.css" />
   </head>
   <body class="public-page">
     <div id="toast-region" class="toast-region" aria-live="polite"></div>
@@ -33,11 +34,24 @@
           <button id="trial-button" class="primary-button">Записаться на пробное</button>
         </div>
         <model-viewer
+          class="hero-barn"
+          src="/assets/virtual_fantasy_yoga_barn.glb"
+          alt="Йога-студия в 3D"
+          disable-zoom
+          interaction-prompt="none"
+          camera-orbit="-25deg 58deg 105%"
+          field-of-view="28deg"
+          shadow-intensity="1"
+          shadow-softness="1"
+          exposure="1.35"
+          tone-mapping="neutral"
+        ></model-viewer>
+        <model-viewer
           class="hero-model"
-          src="https://llatgmpjzcotecfsgodm.supabase.co/storage/v1/object/public/model-assets/yoga_-_buddha.glb"
+          src="/assets/yoga_-_buddha.glb"
           alt="Статуя Будды в позе лотоса"
           auto-rotate
-          rotation-per-second="30deg"
+          rotation-per-second="12deg"
           camera-controls
           disable-zoom
           shadow-intensity="1"
@@ -90,22 +104,6 @@
           <p class="eyebrow">О студии</p>
           <h2>Пространство для вдохновения</h2>
         </div>
-        <model-viewer
-          class="barn-model reveal"
-          src="https://llatgmpjzcotecfsgodm.supabase.co/storage/v1/object/public/model-assets/virtual_fantasy_yoga_barn.glb"
-          alt="Йога-бarn в 3D"
-          loading="lazy"
-          auto-rotate
-          rotation-per-second="6deg"
-          disable-zoom
-          interaction-prompt="none"
-          camera-orbit="-25deg 58deg 155%"
-          field-of-view="28deg"
-          shadow-intensity="1"
-          shadow-softness="1"
-          exposure="1.5"
-          tone-mapping="neutral"
-        ></model-viewer>
       </section>
     </main>
 
@@ -132,6 +130,10 @@
     </dialog>
 
     <script src="/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="/vendor/liquid-glass/container.js"></script>
+    <script src="/vendor/liquid-glass/button.js"></script>
+    <script src="/liquid-glass.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>

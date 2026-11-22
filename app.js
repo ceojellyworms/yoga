@@ -54,7 +54,8 @@
     document.querySelector(".brand").innerHTML = escapeHtml(data.name);
     if (data.headline) document.querySelector(".hero h1").textContent = data.headline;
     if (data.about_text) document.querySelector(".atmosphere h2").textContent = data.about_text;
-    document.querySelector("#trial-button").hidden = !data?.trial_enabled;
+    const trialButton = document.querySelector("#trial-button");
+    if (trialButton) trialButton.hidden = !data?.trial_enabled;
     loadSchedule(activeDay);
   }
 
@@ -144,7 +145,8 @@
     dialog.showModal();
   });
 
-  document.querySelector("#trial-button").addEventListener("click", () => {
+  const trialButton = document.querySelector("#trial-button");
+  trialButton?.addEventListener("click", () => {
     document.querySelector("#schedule").scrollIntoView({ behavior: "smooth" });
   });
   document.querySelectorAll(".scroll-schedule").forEach((button) => {
