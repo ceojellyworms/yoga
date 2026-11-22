@@ -59,34 +59,62 @@ Deno.serve(async (request) => {
     };
     const adminLogin = `club-${random().slice(0, 10)}`;
     const adminPassword = `Ps-${random()}-${random().slice(0, 8)}`;
-    const adminEmail = `${adminLogin}@flow-admin.local`;
+    const adminEmail = `${adminLogin}@flowstudio-admin.com`;
+
+    const { data: existingSlug } = await supabase
+      .from("studios")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (existingSlug) {
+      return new Response(JSON.stringify({ error: "Этот адрес проекта уже занят" }), {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const { data: adminData, error: adminError } = await supabase.auth.admin.createUser({
       email: adminEmail,
       password: adminPassword,
       email_confirm: true,
     });
-    if (adminError || !adminData.user) throw adminError || new Error("Failed to create admin");
+    if (adminError || !adminData.user) {
+      const detail =
+        adminError && "message" in adminError
+          ? String(adminError.message)
+          : "Failed to create admin";
+      throw new Error(`Auth create failed: ${detail}`);
+    }
     const adminUserId = adminData.user.id;
 
-    const { data: studio, error: studioError } = await supabase
-      .from("studios")
-      .insert({
-        user_id: adminUserId,
-        name,
-        slug,
-        admin_login: adminLogin,
-        admin_email: adminEmail,
-        admin_initial_password: adminPassword,
-      })
-      .select("*")
-      .single();
-    if (studioError) throw studioError;
+    let studio;
+    try {
+      const { data: createdStudio, error: studioError } = await supabase
+        .from("studios")
+        .insert({
+          user_id: adminUserId,
+          name,
+          slug,
+          admin_login: adminLogin,
+          admin_email: adminEmail,
+          admin_initial_password: adminPassword,
+        })
+        .select("*")
+        .single();
+      if (studioError) throw studioError;
+      studio = createdStudio;
 
-    const { error: projectAdminError } = await supabase
-      .from("project_admins")
-      .insert({ studio_id: studio.id, user_id: adminUserId });
-    if (projectAdminError) throw projectAdminError;
+      const { error: projectAdminError } = await supabase
+        .from("project_admins")
+        .insert({ studio_id: studio.id, user_id: adminUserId });
+      if (projectAdminError) throw projectAdminError;
+    } catch (error) {
+      if (studio?.id) {
+        await supabase.from("studios").delete().eq("id", studio.id);
+      }
+      await supabase.auth.admin.deleteUser(adminUserId);
+      throw error;
+    }
 
     return new Response(JSON.stringify({
       ok: true,
@@ -99,7 +127,16 @@ Deno.serve(async (request) => {
     });
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Failed" }), {
+    let message = "Failed";
+    if (error instanceof Error) {
+      message = error.message;
+    } else if (error && typeof error === "object") {
+      const record = error as Record<string, unknown>;
+      message = String(record.message || record.error || JSON.stringify(error));
+    } else {
+      message = String(error);
+    }
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

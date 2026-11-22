@@ -157,7 +157,16 @@
       });
       if (error) {
         console.error(error);
-        showToast(data?.error || "Не удалось создать проект", "error");
+        let message = "Не удалось создать проект";
+        if (error.context?.json) {
+          try {
+            const body = await error.context.json();
+            message = body.error || message;
+          } catch (_) {}
+        } else if (data?.error) {
+          message = data.error;
+        }
+        showToast(message, "error");
         return;
       }
       const resultPanel = document.querySelector("#projects-list");
@@ -219,7 +228,7 @@
       const resetButton = event.target.closest(".reset-project-password");
       if (resetButton) {
         if (!confirm("Сгенерировать новый пароль для администратора проекта?")) return;
-        const { error } = await supabase.functions.invoke("manage-project", {
+        const { data: resetData, error } = await supabase.functions.invoke("manage-project", {
           body: { action: "reset_password", studio_id: resetButton.dataset.id },
         });
         if (error) {
@@ -227,7 +236,7 @@
           showToast("Не удалось сменить пароль", "error");
         } else {
           await renderSuperadmin();
-          showToast(`Новый пароль: ${data.password}`);
+          showToast(`Новый пароль: ${resetData.password}`);
         }
       }
     });
