@@ -58,6 +58,9 @@
       return;
     }
     if (profile.role === "superadmin") {
+      const adminBrand = document.querySelector("#admin-brand");
+      adminBrand.textContent = "Панель проектов";
+      document.title = "Панель проектов";
       document.querySelectorAll(".admin-tabs [data-tab]").forEach((tab) => {
         tab.hidden = tab.dataset.tab !== "superadmin-admin";
       });
@@ -88,6 +91,9 @@
       return;
     }
     studio = studioData;
+    const adminBrand = document.querySelector("#admin-brand");
+    adminBrand.textContent = studio.name;
+    document.title = `${studio.name} — Панель`;
     await renderSchedule();
   }
 
