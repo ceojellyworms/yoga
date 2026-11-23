@@ -111,7 +111,7 @@
             <p>${escapeHtml(trainersById[item.trainer_id]?.name || "Тренер уточняется")}</p>
             <p class="spots">${spots ? `Осталось ${spots} ${pluralPlaces(spots)}` : "Мест нет"}</p>
           </div>
-          <button class="primary-button book-button" data-id="${item.id}" data-title="${escapeHtml(item.title)}" ${spots === 0 ? "disabled" : ""}>Забронировать</button>
+          <button class="primary-button liquid-control book-button" data-id="${item.id}" data-title="${escapeHtml(item.title)}" ${spots === 0 ? "disabled" : ""}>Забронировать</button>
         </article>`;
     }).join("");
   }

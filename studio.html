@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f4f1ea" />
+    <meta name="theme-color" content="#e0f7fa" />
     <meta name="description" content="Йога и танцы в Flow Studio. Выберите занятие и запишитесь онлайн." />
     <title>Flow Studio</title>
     <link rel="preload" as="image" href="/assets/buddha-poster.webp" fetchpriority="high" />
@@ -19,7 +19,7 @@
     <div id="toast-region" class="toast-region" aria-live="polite"></div>
     <header class="site-header">
       <a class="brand" href="/flow-studio" aria-label="Flow Studio">FLOW <span>STUDIO</span></a>
-      <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="main-nav">
+      <button class="menu-toggle liquid-control" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="main-nav">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
           <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
         </svg>
@@ -81,19 +81,19 @@
         </div>
         <div class="direction-grid">
           <article class="direction-card reveal">
-            <model-viewer src="/assets/girl_yoga.glb" alt="Йога" loading="lazy" decoding="async" auto-rotate rotation-per-second="2deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
+            <model-viewer src="/assets/girl_yoga.glb" poster="/assets/yoga-card-poster.webp" alt="Йога" loading="lazy" auto-rotate rotation-per-second="2deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
             <div class="card-copy">
               <h3>Йога</h3>
               <p>Мягкая практика для силы, гибкости и внутреннего баланса.</p>
-              <button class="glass-button scroll-schedule">Узнать расписание</button>
+              <button class="glass-button liquid-control scroll-schedule">Узнать расписание</button>
             </div>
           </article>
           <article class="direction-card reveal">
-            <model-viewer src="/assets/blue_dress_modern_dancer.glb" alt="Танцы" loading="lazy" decoding="async" auto-rotate rotation-per-second="2deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
+            <model-viewer src="/assets/blue_dress_modern_dancer.glb" poster="/assets/dance-card-poster.webp" alt="Танцы" loading="lazy" auto-rotate rotation-per-second="2deg" camera-controls disable-zoom exposure="1.15" shadow-intensity="0.7"></model-viewer>
             <div class="card-copy">
               <h3>Танцы</h3>
               <p>Движение с музыкой, элегантностью и чувством свободы.</p>
-              <button class="glass-button scroll-schedule">Узнать расписание</button>
+              <button class="glass-button liquid-control scroll-schedule">Узнать расписание</button>
             </div>
           </article>
         </div>
@@ -122,7 +122,7 @@
 
     <dialog id="booking-dialog" class="booking-dialog">
       <form id="booking-form" method="dialog">
-        <button type="button" id="close-dialog" class="dialog-close" aria-label="Закрыть">×</button>
+        <button type="button" id="close-dialog" class="dialog-close liquid-control" aria-label="Закрыть">×</button>
         <div id="booking-fields">
           <p class="eyebrow">Бронирование</p>
           <h2 id="booking-title">Выберите занятие</h2>
@@ -132,7 +132,7 @@
           <label>Телефон
             <input id="phone-input" name="client_phone" required autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" />
           </label>
-          <button class="primary-button" type="submit">Отправить</button>
+          <button class="primary-button liquid-control" type="submit">Отправить</button>
         </div>
         <div id="booking-success" class="booking-success" hidden>
           <div class="success-mark">✓</div>
