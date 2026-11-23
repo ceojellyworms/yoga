@@ -1,4 +1,19 @@
 {
+  "headers": [
+    {
+      "source": "/assets/(.*).glb",
+      "headers": [
+        { "key": "Content-Type", "value": "model/gltf-binary" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/assets/(.*).webp",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/flow-studio", "destination": "/studio.html" },
     { "source": "/flow-studio/", "destination": "/studio.html" },

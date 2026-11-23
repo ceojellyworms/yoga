@@ -219,16 +219,9 @@
     });
   }, { threshold: 0.12 });
   document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
-  const directionModels = document.querySelectorAll("#directions model-viewer");
-  const modelObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.loading = "eager";
-        modelObserver.unobserve(entry.target);
-      }
-    });
-  }, { rootMargin: "600px 0px" });
-  directionModels.forEach((model) => modelObserver.observe(model));
+  document.querySelectorAll("#directions model-viewer").forEach((model) => {
+    model.loading = "eager";
+  });
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     document.querySelectorAll("model-viewer[auto-rotate]").forEach((viewer) => viewer.removeAttribute("auto-rotate"));
   }
