@@ -46,6 +46,9 @@ Deno.serve(async (request) => {
       .toLowerCase()
       .replace(/[^a-z0-9-]+/g, "-")
       .replace(/^-|-$/g, "");
+    const directionMode = ["yoga", "dance", "both"].includes(String(body.direction_mode))
+      ? String(body.direction_mode)
+      : "both";
     if (!name || !slug) {
       return new Response(JSON.stringify({ error: "Invalid project data" }), {
         status: 400,
@@ -95,6 +98,7 @@ Deno.serve(async (request) => {
           user_id: adminUserId,
           name,
           slug,
+          direction_mode: directionMode,
           admin_login: adminLogin,
           admin_email: adminEmail,
           admin_initial_password: adminPassword,

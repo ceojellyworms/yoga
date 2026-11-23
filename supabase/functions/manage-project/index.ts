@@ -50,9 +50,12 @@ Deno.serve(async (request) => {
         .replace(/[^a-z0-9-]+/g, "-")
         .replace(/^-|-$/g, "");
       if (!name || !slug) throw new Error("Invalid project data");
+      const directionMode = ["yoga", "dance", "both"].includes(String(body.direction_mode))
+        ? String(body.direction_mode)
+        : undefined;
       const { error } = await supabase
         .from("studios")
-        .update({ name, slug })
+        .update({ name, slug, ...(directionMode ? { direction_mode: directionMode } : {}) })
         .eq("id", studioId);
       if (error) throw error;
       return new Response(JSON.stringify({ ok: true }), {

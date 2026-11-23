@@ -12,8 +12,14 @@
     <link rel="preload" as="fetch" href="/assets/blue_dress_modern_dancer.glb" type="model/gltf-binary" crossorigin />
     <link rel="preconnect" href="https://ajax.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&family=Mulish:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://llatgmpjzcotecfsgodm.supabase.co" crossorigin />
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script defer src="/vendor/liquid-glass/container.js"></script>
+    <script defer src="/vendor/liquid-glass/button.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="/styles.css" />
   </head>
@@ -37,18 +43,21 @@
     <main>
       <section class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Йога и танцы</p>
+          <p id="hero-eyebrow" class="eyebrow">Йога и танцы</p>
           <h1>Найди гармонию в движении</h1>
           <p>Тёплое пространство для тела и ума. Начни с занятия, которое чувствуешь своим.</p>
           <button id="trial-button" class="primary-button liquid-control">Записаться на пробное</button>
         </div>
         <model-viewer
           class="hero-barn"
+          id="scroll-scene"
           src="/assets/virtual_fantasy_yoga_barn.glb"
           poster="/assets/barn-poster.webp"
           alt=""
           aria-hidden="true"
           loading="eager"
+          reveal="auto"
+          orientation="0deg 0deg 0deg"
           disable-zoom
           interaction-prompt="none"
           camera-orbit="-25deg 58deg 105%"
@@ -60,6 +69,7 @@
         ></model-viewer>
         <model-viewer
           class="hero-model"
+          id="hero-buddha"
           src="/assets/yoga_-_buddha.glb"
           poster="/assets/buddha-poster.webp"
           alt="Статуя Будды в позе лотоса"
@@ -82,12 +92,14 @@
           <h2>Выбери своё</h2>
         </div>
         <div class="direction-grid">
-          <article class="direction-card reveal">
+          <article class="direction-card reveal" data-direction="yoga">
             <model-viewer
               src="/assets/girl_yoga.glb"
+              poster="/assets/yoga-card-poster.webp"
               alt="Йога"
-              loading="eager"
+              loading="lazy"
               auto-rotate
+              autoplay
               rotation-per-second="2deg"
               camera-controls
               disable-zoom
@@ -103,12 +115,14 @@
               <button class="glass-button liquid-control scroll-schedule">Узнать расписание</button>
             </div>
           </article>
-          <article class="direction-card reveal">
+          <article class="direction-card reveal" data-direction="dance">
             <model-viewer
               src="/assets/blue_dress_modern_dancer.glb"
+              poster="/assets/dance-card-poster.webp"
               alt="Танцы"
-              loading="eager"
+              loading="lazy"
               auto-rotate
+              autoplay
               rotation-per-second="2deg"
               camera-controls
               disable-zoom
@@ -141,6 +155,7 @@
       </section>
 
       <section id="about" class="section atmosphere">
+        <model-viewer class="atmosphere-scene" id="atmosphere-scene" src="/assets/virtual_fantasy_yoga_barn.glb" poster="/assets/barn-poster.webp" alt="Йога-пространство среди деревьев" camera-orbit="-25deg 58deg 105%" field-of-view="32deg" disable-zoom interaction-prompt="none" loading="lazy" orientation="0deg 0deg 0deg" shadow-intensity="1" shadow-softness="1" exposure="1.1"></model-viewer>
         <div class="section-heading reveal">
           <p class="eyebrow">О студии</p>
           <h2>Пространство для вдохновения</h2>
@@ -150,7 +165,7 @@
 
     <dialog id="booking-dialog" class="booking-dialog">
       <form id="booking-form" method="dialog">
-        <button type="button" id="close-dialog" class="dialog-close liquid-control" aria-label="Закрыть">×</button>
+        <button type="button" id="close-dialog" class="dialog-close liquid-control" aria-label="Закрыть"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg></button>
         <div id="booking-fields">
           <p class="eyebrow">Бронирование</p>
           <h2 id="booking-title">Выберите занятие</h2>
@@ -163,7 +178,7 @@
           <button class="primary-button liquid-control" type="submit">Отправить</button>
         </div>
         <div id="booking-success" class="booking-success" hidden>
-          <div class="success-mark">✓</div>
+          <div class="success-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="32" height="32"><path d="m5 12 4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
           <h2>Заявка отправлена</h2>
           <p>Мы свяжемся с вами в ближайшее время.</p>
         </div>
@@ -172,5 +187,6 @@
 
     <script defer src="/config.js"></script>
     <script defer src="/app.js"></script>
+    <script defer src="/liquid-glass.js"></script>
   </body>
 </html>

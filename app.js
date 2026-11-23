@@ -29,6 +29,11 @@
     setTimeout(() => toast.remove(), 4500);
   }
 
+  function markPageReadyForGlass() {
+    window.flowStudioReady = true;
+    window.dispatchEvent(new Event("flow-studio:ready"));
+  }
+
   function renderTabs() {
     tabs.innerHTML = dayNames.map((name, index) =>
       `<button class="day-tab ${index + 1 === activeDay ? "active" : ""}" data-day="${index + 1}">${name}</button>`
@@ -36,19 +41,24 @@
   }
 
   async function loadStudioSettings() {
-    if (!supabase) return;
+    if (!supabase) {
+      markPageReadyForGlass();
+      return;
+    }
     const { data, error } = await supabase
       .from("public_studios")
-      .select("id,name,headline,about_text,trial_enabled,show_prices")
+      .select("id,name,headline,about_text,direction_mode,trial_enabled,show_prices")
       .eq("slug", slug)
       .maybeSingle();
     if (error) {
       console.error(error);
       showToast("Не удалось загрузить настройки студии", "error");
+      markPageReadyForGlass();
       return;
     }
     if (!data) {
       scheduleList.innerHTML = '<div class="schedule-card"><h3>Проект не найден</h3></div>';
+      markPageReadyForGlass();
       return;
     }
     studioId = data.id;
@@ -56,9 +66,16 @@
     document.querySelector(".brand").innerHTML = escapeHtml(data.name);
     if (data.headline) document.querySelector(".hero h1").textContent = data.headline;
     if (data.about_text) document.querySelector(".atmosphere h2").textContent = data.about_text;
+    const directionMode = data.direction_mode || "both";
+    document.querySelectorAll("[data-direction]").forEach((card) => {
+      card.hidden = directionMode !== "both" && card.dataset.direction !== directionMode;
+    });
+    const eyebrow = document.querySelector("#hero-eyebrow");
+    if (eyebrow) eyebrow.textContent = directionMode === "yoga" ? "Йога" : directionMode === "dance" ? "Танцы" : "Йога и танцы";
     const trialButton = document.querySelector("#trial-button");
     if (trialButton) trialButton.hidden = !data?.trial_enabled;
-    loadSchedule(activeDay);
+    await loadSchedule(activeDay);
+    markPageReadyForGlass();
   }
 
   async function loadSchedule(day) {
@@ -219,10 +236,42 @@
     });
   }, { threshold: 0.12 });
   document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
-  document.querySelectorAll("#directions model-viewer").forEach((model) => {
-    model.loading = "eager";
-  });
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const scrollScene = document.querySelector("#scroll-scene");
+  const atmosphereScene = document.querySelector("#atmosphere-scene");
+  const motionAllowed = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const updateScrollScene = () => {
+    if (!motionAllowed) return;
+    const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    const progress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
+    const rotation = (progress * 360).toFixed(1);
+    const orientation = `0deg ${rotation}deg 0deg`;
+    if (scrollScene) {
+      scrollScene.setAttribute("orientation", orientation);
+      scrollScene.orientation = orientation;
+    }
+    if (atmosphereScene) {
+      atmosphereScene.setAttribute("orientation", orientation);
+      atmosphereScene.orientation = orientation;
+    }
+  };
+  let scrollFrame = 0;
+  window.addEventListener("scroll", () => {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      scrollFrame = 0;
+      updateScrollScene();
+    });
+  }, { passive: true });
+  window.addEventListener("resize", updateScrollScene, { passive: true });
+  [scrollScene, atmosphereScene].forEach((scene) => scene?.addEventListener("load", updateScrollScene));
+  updateScrollScene();
+  if (motionAllowed) {
+    document.querySelectorAll("#directions model-viewer").forEach((model) => {
+      model.loading = "lazy";
+      model.addEventListener("load", () => model.play?.(), { once: true });
+    });
+  }
+  if (!motionAllowed) {
     document.querySelectorAll("model-viewer[auto-rotate]").forEach((viewer) => viewer.removeAttribute("auto-rotate"));
   }
 

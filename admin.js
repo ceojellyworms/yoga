@@ -180,6 +180,7 @@
       <form id="project-form" class="admin-form">
         <label>Название проекта<input name="name" required placeholder="Название студии" /></label>
         <label>Адрес проекта<input name="slug" required placeholder="например: moon-yoga" /></label>
+        <label>Направления<select name="direction_mode"><option value="yoga">Только йога</option><option value="dance">Только танцы</option><option value="both" selected>Йога и танцы</option></select></label>
         <button class="primary-button" type="submit">Создать проект</button>
       </form>
       <div id="projects-list">Загрузка...</div>`;
@@ -191,6 +192,7 @@
         body: {
           name: form.get("name"),
           slug: form.get("slug"),
+          direction_mode: form.get("direction_mode"),
           site_url: `${location.origin}/`,
         },
       });
@@ -223,7 +225,7 @@
 
     const { data, error } = await supabase
       .from("studios")
-      .select("id,name,slug,admin_login,admin_email,admin_initial_password,created_at")
+      .select("id,name,slug,direction_mode,admin_login,admin_email,admin_initial_password,created_at")
       .order("created_at", { ascending: false });
     if (error) {
       console.error(error);
@@ -236,6 +238,7 @@
           <div>
             <h3>${escapeHtml(project.name)}</h3>
             <p><a href="/${escapeHtml(project.slug)}" target="_blank">/${escapeHtml(project.slug)}</a></p>
+            <p>${project.direction_mode === "yoga" ? "Только йога" : project.direction_mode === "dance" ? "Только танцы" : "Йога и танцы"}</p>
             <p>Логин: ${escapeHtml(project.admin_login || project.admin_email || "")}</p>
           </div>
           <div>
@@ -259,8 +262,13 @@
         if (!name) return;
         const slug = prompt("Адрес проекта", editButton.dataset.slug);
         if (!slug) return;
+        const directionMode = prompt("Направления: yoga, dance или both", "both");
+        if (!["yoga", "dance", "both"].includes(directionMode)) {
+          showToast("Укажите yoga, dance или both", "error");
+          return;
+        }
         const { error } = await supabase.functions.invoke("manage-project", {
-          body: { action: "update", studio_id: editButton.dataset.id, name, slug },
+          body: { action: "update", studio_id: editButton.dataset.id, name, slug, direction_mode: directionMode },
         });
         if (error) {
           console.error(error);
@@ -406,6 +414,7 @@
       <h2>Настройки</h2>
       <form id="settings-form" class="admin-form">
         <label>Название студии<input name="name" value="${escapeHtml(studio.name || "")}"></label>
+        <label>Направления<select name="direction_mode"><option value="yoga" ${studio.direction_mode === "yoga" ? "selected" : ""}>Только йога</option><option value="dance" ${studio.direction_mode === "dance" ? "selected" : ""}>Только танцы</option><option value="both" ${!studio.direction_mode || studio.direction_mode === "both" ? "selected" : ""}>Йога и танцы</option></select></label>
         <label>Главный слоган<input name="headline" value="${escapeHtml(studio.headline || "")}"></label>
         <label>Текст о студии<textarea name="about_text">${escapeHtml(studio.about_text || "")}</textarea></label>
         <label><input name="trial_enabled" type="checkbox" ${studio.trial_enabled ? "checked" : ""}> Показывать пробное занятие</label>
@@ -441,6 +450,7 @@
       const form = new FormData(event.currentTarget);
       const updates = {
         name: form.get("name"),
+        direction_mode: form.get("direction_mode"),
         headline: form.get("headline") || null,
         about_text: form.get("about_text") || null,
         trial_enabled: form.has("trial_enabled"),
