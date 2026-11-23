@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body class="public-page">
+    <svg class="glass-filters" aria-hidden="true" focusable="false"><filter id="liquid-refraction" x="-15%" y="-25%" width="130%" height="150%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.018 0.032" numOctaves="2" seed="8" result="noise"/><feGaussianBlur in="noise" stdDeviation="1.5" result="softNoise"/><feDisplacementMap in="SourceGraphic" in2="softNoise" scale="13" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
     <div id="toast-region" class="toast-region" aria-live="polite"></div>
     <header class="site-header">
       <a class="brand" href="/flow-studio" aria-label="Flow Studio">FLOW <span>STUDIO</span></a>
@@ -40,6 +41,8 @@
       <a class="account-link liquid-control" href="/admin">Личный кабинет</a>
     </header>
 
+    <model-viewer class="page-scene" id="scroll-scene" src="/assets/virtual_fantasy_yoga_barn.glb" poster="/assets/barn-poster.webp" alt="" aria-hidden="true" loading="eager" disable-zoom interaction-prompt="none" camera-orbit="-25deg 58deg 105%" field-of-view="28deg" orientation="0deg 0deg 0deg" shadow-intensity="1" shadow-softness="1" exposure="1.2" tone-mapping="neutral"></model-viewer>
+
     <main>
       <section class="hero">
         <div class="hero-copy">
@@ -48,25 +51,6 @@
           <p>Тёплое пространство для тела и ума. Начни с занятия, которое чувствуешь своим.</p>
           <button id="trial-button" class="primary-button liquid-control">Записаться на пробное</button>
         </div>
-        <model-viewer
-          class="hero-barn"
-          id="scroll-scene"
-          src="/assets/virtual_fantasy_yoga_barn.glb"
-          poster="/assets/barn-poster.webp"
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          reveal="auto"
-          orientation="0deg 0deg 0deg"
-          disable-zoom
-          interaction-prompt="none"
-          camera-orbit="-25deg 58deg 105%"
-          field-of-view="28deg"
-          shadow-intensity="1"
-          shadow-softness="1"
-          exposure="1.2"
-          tone-mapping="neutral"
-        ></model-viewer>
         <model-viewer
           class="hero-model"
           id="hero-buddha"
